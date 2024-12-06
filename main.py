@@ -297,11 +297,21 @@ def exit_video_feed():
     captured = False  # Reset captured flag when starting exit feed
     return Response(generate_exit_frames(), mimetype='multipart/x-mixed-replace; boundary=frame')
 
+@app.route('/total_fare', methods=['GET'])
+def get_total_fare():
+    try:
+        # Query to fetch all fares from the database
+        query = "SELECT fare FROM passengers WHERE status='verified'"  # You can modify this condition if needed
+        cursor.execute(query)
+        fares = cursor.fetchall()
 
+        # Sum all the fares
+        total_fare = sum(fare[0] for fare in fares)  # Sum the first element of each tuple (the fare value)
+        # Return the total fare as a response
+        return jsonify({'total_fare': total_fare,"status":'true'})
 
-
-
-
+    except mysql.connector.Error as err:
+        return jsonify({'status': 'error', 'message': str(err)}), 500
 
 if __name__ == '__main__':
     # Ensure the server is running in debug mode
